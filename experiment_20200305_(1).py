@@ -81,6 +81,7 @@ for i in range(0, 6):
     body.append([datetime[i], I, datetime[i+6], II])
 data = header + body
 
+
 #generates pdf with table
 t=Table(data, repeatRows=2)
 t.setStyle(TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'), ('VALIGN',(0,0),(-1,-1),'MIDDLE'), ('INNERGRID', (0,0), (-1,-1), .7, colors.black), ('BOX', (0,0), (-1,-1), .7, colors.black)]))
