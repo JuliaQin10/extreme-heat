@@ -1,5 +1,6 @@
 import os
 import skimage
+import math
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,7 +9,7 @@ from PIL import Image
 import milad
 import reportlab
 from reportlab.lib.pagesizes import LETTER, inch
-from reportlab.platypus import Table, TableStyle, SimpleDocTemplate, Paragraph, Image
+from reportlab.platypus import Table, TableStyle, SimpleDocTemplate, Paragraph, Image, PageBreak
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib import colors
@@ -66,24 +67,31 @@ sensortemp = Paragraph('<b>Date Sensor Temp</b>', headerstyle)
 imagelabel = Paragraph('<b>Image</b>', headerstyle)
 header = [[sensortemp, imagelabel, sensortemp, imagelabel]]
 
-#create remaining rows by looping through datetime and images in specific sizes
-#alternate columns of labels and images
 pngroot = "/Users/Julia/PycharmProjects/pythonProject"
 processedpng = sorted([png for png in os.listdir(pngroot) if ".png" in png])
-body = [ ]
-for i in range(0, 6):
-    I = Image(processedpng[i])
-    I.drawHeight = 1.38 * inch
-    I.drawWidth = 1.83 * inch
-    II = Image(processedpng[i+6])
-    II.drawHeight = 1.38 * inch
-    II.drawWidth = 1.83 * inch
-    body.append([datetime[i], I, datetime[i+6], II])
-data = header + body
-
-
-#generates pdf with table
-t=Table(data, repeatRows=2)
-t.setStyle(TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'), ('VALIGN',(0,0),(-1,-1),'MIDDLE'), ('INNERGRID', (0,0), (-1,-1), .7, colors.black), ('BOX', (0,0), (-1,-1), .7, colors.black)]))
-elements.append(t)
+print(len(processedpng))
+pagenum = math.ceil(len(processedpng)/12) #create pdf with multiple pages
+for i in range(0, pagenum):
+    start = i*12
+    stop = (i+1)*12
+    body = []
+    for j in range(start, stop): # create remaining rows by looping through datetime and images in specific sizes
+        if (j+6) < len(processedpng):
+            print(j)
+            I = Image(processedpng[j])
+            I.drawHeight = 1.38 * inch
+            I.drawWidth = 1.83 * inch
+            II = Image(processedpng[j + 6])
+            II.drawHeight = 1.38 * inch
+            II.drawWidth = 1.83 * inch
+            body.append([datetime[j], I, datetime[j + 6], II]) #alternate columns of labels and images
+        else:
+            pass
+    data = header + body
+    t = Table(data)  # generates table for pdf
+    t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'CENTER'), ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                           ('INNERGRID', (0, 0), (-1, -1), .7, colors.black),
+                           ('BOX', (0, 0), (-1, -1), .7, colors.black)]))
+    elements.append(t)
+    elements.append(PageBreak())
 pdffile.build(elements)
