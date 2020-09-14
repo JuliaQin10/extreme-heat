@@ -69,7 +69,7 @@ header = [[sensortemp, imagelabel, sensortemp, imagelabel]]
 #create remaining rows by looping through datetime and images in specific sizes
 #alternate columns of labels and images
 pngroot = "/Users/Julia/PycharmProjects/pythonProject"
-processedpng = [png for png in os.listdir(pngroot) if ".png" in png]
+processedpng = sorted([png for png in os.listdir(pngroot) if ".png" in png])
 body = [ ]
 for i in range(0, 6):
     I = Image(processedpng[i])
@@ -82,7 +82,7 @@ for i in range(0, 6):
 data = header + body
 
 #generates pdf with table
-t=Table(data)
+t=Table(data, repeatRows=2)
 t.setStyle(TableStyle([('ALIGN',(0,0),(-1,-1),'CENTER'), ('VALIGN',(0,0),(-1,-1),'MIDDLE'), ('INNERGRID', (0,0), (-1,-1), .7, colors.black), ('BOX', (0,0), (-1,-1), .7, colors.black)]))
 elements.append(t)
 pdffile.build(elements)
