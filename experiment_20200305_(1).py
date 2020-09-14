@@ -72,21 +72,25 @@ processedpng = sorted([png for png in os.listdir(pngroot) if ".png" in png])
 print(len(processedpng))
 pagenum = math.ceil(len(processedpng)/12) #create pdf with multiple pages
 for i in range(0, pagenum):
-    start = i*12
-    stop = (i+1)*12
+    ## start and stop index for the current page
+    start = i * 12
+    stop = min((i + 1) * 12, len(processedpng))
+    ## page contents
     body = []
-    for j in range(start, stop): # create remaining rows by looping through datetime and images in specific sizes
-        if (j+6) < len(processedpng):
-            print(j)
-            I = Image(processedpng[j])
-            I.drawHeight = 1.38 * inch
-            I.drawWidth = 1.83 * inch
+    for j in range(start, min(start + 6, stop)):  # create remaining rows by looping through datetime and images in
+        # specific sizes
+        I = Image(processedpng[j])
+        I.drawHeight = 1.38 * inch
+        I.drawWidth = 1.83 * inch
+        ## the first column
+        row = [datetime[j], I]
+        if (j + 6) < stop:
             II = Image(processedpng[j + 6])
             II.drawHeight = 1.38 * inch
             II.drawWidth = 1.83 * inch
-            body.append([datetime[j], I, datetime[j + 6], II]) #alternate columns of labels and images
-        else:
-            pass
+            ## the second column
+            row += [datetime[j + 6], II]  # alternate columns of labels and images
+        body.append(row)
     data = header + body
     t = Table(data)  # generates table for pdf
     t.setStyle(TableStyle([('ALIGN', (0, 0), (-1, -1), 'CENTER'), ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
